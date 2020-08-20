@@ -1,3 +1,5 @@
+import { type } from "os";
+
 class LocalSavePurchases {
   constructor(private readonly cacheStore: CacheStore) {}
 
@@ -18,16 +20,28 @@ class CacheStoreSpy implements CacheStore {
   }
 }
 
+type SutTypes = {
+  sut: LocalSavePurchases;
+  cacheStore: CacheStoreSpy;
+};
+
+const makeSut = (): SutTypes => {
+  const cacheStore = new CacheStoreSpy();
+  const sut = new LocalSavePurchases(cacheStore);
+  return {
+    sut,
+    cacheStore,
+  };
+};
+
 describe("localSavePurchases", () => {
   it("shouln't delete chache on sut.init", () => {
-    const cacheStore = new CacheStoreSpy();
-    new LocalSavePurchases(cacheStore);
+    const { cacheStore } = makeSut();
     expect(cacheStore.deleteCallsCount).toBe(0);
   });
 
   it("should delete chache on sut.save", () => {
-    const cacheStore = new CacheStoreSpy();
-    const sut = new LocalSavePurchases(cacheStore);
+    const { cacheStore, sut } = makeSut();
     sut.save();
     expect(cacheStore.deleteCallsCount).toBe(1);
   });
