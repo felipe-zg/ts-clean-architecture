@@ -5,36 +5,36 @@ export class CacheStoreSpy implements CacheStore {
   deleteKey: string;
   insertKey: string;
   insertValues: Array<SavePurchases.Params> = [];
-  messages: Array<CacheStoreSpy.message> = [];
+  actions: Array<CacheStoreSpy.Action> = [];
 
   delete(key: string): void {
-    this.messages.push(CacheStoreSpy.message.delete);
+    this.actions.push(CacheStoreSpy.Action.delete);
     this.deleteKey = key;
   }
 
   insert(insertKey: string, value: any): void {
-    this.messages.push(CacheStoreSpy.message.insert);
+    this.actions.push(CacheStoreSpy.Action.insert);
     this.insertKey = insertKey;
     this.insertValues = value;
   }
 
   simulateDeleteError(): void {
     jest.spyOn(CacheStoreSpy.prototype, "delete").mockImplementationOnce(() => {
-      this.messages.push(CacheStoreSpy.message.delete);
+      this.actions.push(CacheStoreSpy.Action.delete);
       throw new Error();
     });
   }
 
   simulateInsertError(): void {
     jest.spyOn(CacheStoreSpy.prototype, "insert").mockImplementationOnce(() => {
-      this.messages.push(CacheStoreSpy.message.insert);
+      this.actions.push(CacheStoreSpy.Action.insert);
       throw new Error();
     });
   }
 }
 
 export namespace CacheStoreSpy {
-  export enum message {
+  export enum Action {
     delete,
     insert,
   }
