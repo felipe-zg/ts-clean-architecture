@@ -2,15 +2,17 @@ import { SavePurchases } from "@/domain/useCases";
 import { CacheStore } from "../protocols/cache";
 
 export class CacheStoreSpy implements CacheStore {
+  actions: Array<CacheStoreSpy.Action> = [];
   fetchKey: string;
   deleteKey: string;
   insertKey: string;
   insertValues: Array<SavePurchases.Params> = [];
-  actions: Array<CacheStoreSpy.Action> = [];
+  fetchResul: any;
 
-  fetch(key: string): void {
+  fetch(key: string): any {
     this.actions.push(CacheStoreSpy.Action.fetch);
     this.fetchKey = key;
+    return this.fetchResul;
   }
 
   delete(key: string): void {
