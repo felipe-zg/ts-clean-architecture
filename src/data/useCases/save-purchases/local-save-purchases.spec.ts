@@ -18,19 +18,25 @@ const makeSut = (): SutTypes => {
 describe("localSavePurchases", () => {
   it("shouln't delete chache on sut.init", () => {
     const { cacheStore } = makeSut();
-    expect(cacheStore.deleteCallsCount).toBe(0);
+    expect(cacheStore.messages).toEqual([]);
   });
 
-  it("should delete chache on sut.save", () => {
+  it("should delete old chache on sut.save", () => {
     const { cacheStore, sut } = makeSut();
     sut.save(mockPurchases());
-    expect(cacheStore.deleteCallsCount).toBe(1);
+    expect(cacheStore.messages).toEqual([
+      CacheStoreSpy.message.delete,
+      CacheStoreSpy.message.insert,
+    ]);
   });
 
   it("should call delete with correct key", async () => {
     const { cacheStore, sut } = makeSut();
     await sut.save(mockPurchases());
-    expect(cacheStore.deleteCallsCount).toBe(1);
+    expect(cacheStore.messages).toEqual([
+      CacheStoreSpy.message.delete,
+      CacheStoreSpy.message.insert,
+    ]);
     expect(cacheStore.deleteKey).toBe("purchases");
   });
 
@@ -38,7 +44,7 @@ describe("localSavePurchases", () => {
     const { cacheStore, sut } = makeSut();
     cacheStore.simulateDeleteError();
     const promise = sut.save(mockPurchases());
-    expect(cacheStore.insertCallsCount).toBe(0);
+    expect(cacheStore.messages).toEqual([CacheStoreSpy.message.delete]);
     expect(promise).rejects.toThrow();
   });
 
@@ -46,8 +52,10 @@ describe("localSavePurchases", () => {
     const { cacheStore, sut } = makeSut();
     const purchases = mockPurchases();
     await sut.save(purchases);
-    expect(cacheStore.deleteCallsCount).toBe(1);
-    expect(cacheStore.insertCallsCount).toBe(1);
+    expect(cacheStore.messages).toEqual([
+      CacheStoreSpy.message.delete,
+      CacheStoreSpy.message.insert,
+    ]);
     expect(cacheStore.insertKey).toBe("purchases");
     expect(cacheStore.insertValues).toEqual(purchases);
   });
@@ -56,6 +64,10 @@ describe("localSavePurchases", () => {
     const { cacheStore, sut } = makeSut();
     cacheStore.simulateInsertError();
     const promise = sut.save(mockPurchases());
+    expect(cacheStore.messages).toEqual([
+      CacheStoreSpy.message.delete,
+      CacheStoreSpy.message.insert,
+    ]);
     expect(promise).rejects.toThrow();
   });
 });
