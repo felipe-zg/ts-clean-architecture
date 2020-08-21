@@ -2,19 +2,25 @@ import { SavePurchases } from "@/domain/useCases";
 import { CacheStore } from "../protocols/cache";
 
 export class CacheStoreSpy implements CacheStore {
+  fetchKey: string;
   deleteKey: string;
   insertKey: string;
   insertValues: Array<SavePurchases.Params> = [];
   actions: Array<CacheStoreSpy.Action> = [];
+
+  fetch(key: string): void {
+    this.actions.push(CacheStoreSpy.Action.fetch);
+    this.fetchKey = key;
+  }
 
   delete(key: string): void {
     this.actions.push(CacheStoreSpy.Action.delete);
     this.deleteKey = key;
   }
 
-  insert(insertKey: string, value: any): void {
+  insert(key: string, value: any): void {
     this.actions.push(CacheStoreSpy.Action.insert);
-    this.insertKey = insertKey;
+    this.insertKey = key;
     this.insertValues = value;
   }
 
@@ -41,5 +47,6 @@ export namespace CacheStoreSpy {
   export enum Action {
     delete,
     insert,
+    fetch,
   }
 }
