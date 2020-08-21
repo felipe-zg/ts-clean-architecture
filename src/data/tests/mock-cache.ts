@@ -1,6 +1,14 @@
 import { SavePurchases } from "@/domain/useCases";
 import { CacheStore } from "../protocols/cache";
 
+const maxAgeInDays = 3;
+
+export const getCacheExpirationDate = (timestamp: Date): Date => {
+  const maxAge = new Date(timestamp);
+  maxAge.setDate(maxAge.getDate() - maxAgeInDays);
+  return maxAge;
+};
+
 export class CacheStoreSpy implements CacheStore {
   actions: Array<CacheStoreSpy.Action> = [];
   fetchKey: string;
