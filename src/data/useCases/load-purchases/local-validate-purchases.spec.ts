@@ -1,5 +1,9 @@
 import { LocalLoadPurchases } from "./local-load-purchases";
-import { CacheStoreSpy } from "../../tests";
+import {
+  CacheStoreSpy,
+  getCacheExpirationDate,
+  mockPurchases,
+} from "../../tests";
 
 type SutTypes = {
   sut: LocalLoadPurchases;
@@ -30,5 +34,16 @@ describe("localSavePurchases", () => {
       CacheStoreSpy.Action.delete,
     ]);
     expect(cacheStore.deleteKey).toBe("purchases");
+  });
+
+  it("should have no side effects if cache is not expired", () => {
+    const currentDate = new Date();
+    const timestamp = getCacheExpirationDate(currentDate);
+    timestamp.setSeconds(timestamp.getSeconds() + 1);
+    const { cacheStore, sut } = makeSut(currentDate);
+    cacheStore.fetchResul = { timestamp };
+    sut.validate();
+    expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.fetch]);
+    expect(cacheStore.fetchKey).toBe("purchases");
   });
 });
